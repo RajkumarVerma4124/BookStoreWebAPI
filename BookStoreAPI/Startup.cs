@@ -1,3 +1,5 @@
+using BusinessLayer.Interface;
+using BusinessLayer.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,6 +11,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using RepositoryLayer.Interface;
+using RepositoryLayer.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +32,8 @@ namespace BookStoreAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<IUserBL, UserBL>();
+            services.AddTransient<IUserRL, UserRL>();
             services.AddControllers();
             ConfigureSwagger(services);
             services.AddAuthentication(au =>
@@ -58,7 +64,7 @@ namespace BookStoreAPI
         {
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "FundooNotes", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "BookStore", Version = "v1" });
                 //For Authorization
                 var securitySchema = new OpenApiSecurityScheme
                 {
@@ -87,12 +93,14 @@ namespace BookStoreAPI
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BookStore v1"));
             }
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
