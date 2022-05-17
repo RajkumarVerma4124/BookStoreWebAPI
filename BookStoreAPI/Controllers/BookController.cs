@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 using System.Security.Claims;   
 
 namespace BookStoreAPI.Controllers
@@ -17,12 +18,12 @@ namespace BookStoreAPI.Controllers
     public class BookController : ControllerBase
     {
         /// <summary>
-        /// Object Reference For Interface IUserBL
+        /// Object Reference For Interface IBookBL
         /// </summary>
         private readonly IBookBL bookBL;
 
         /// <summary>
-        /// Constructor To Initialize The Instance Of Interface IUserBL
+        /// Constructor To Initialize The Instance Of Interface IBookBL
         /// </summary>
         /// <param name="userBL"></param>
         public BookController(IBookBL bookBL)
@@ -99,7 +100,7 @@ namespace BookStoreAPI.Controllers
                 }
                 else
                 {
-                    return NotFound(new { success = false, message = resBook });
+                    return NotFound(new { success = false, message = "Book Not Found For Deletion" });
                 }
             }
             catch (Exception ex)
@@ -145,14 +146,14 @@ namespace BookStoreAPI.Controllers
         {
             try
             {
-                var resBook = this.bookBL.GetAllBooks();
-                if (resBook != null)
+                var resBookList = this.bookBL.GetAllBooks();
+                if (resBookList.Count() > 0)
                 {
-                    return Ok(new { success = true, message = "Got ALL The Book Succesfully", data = resBook });
+                    return Ok(new { success = true, message = "Got ALL The Book Succesfully", data = resBookList });
                 }
                 else
                 {
-                    return NotFound(new { success = false, message = "Book Not Found" });
+                    return NotFound(new { success = false, message = "Books Not Found" });
                 }
             }
             catch (Exception ex)

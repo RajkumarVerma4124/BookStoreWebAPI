@@ -139,7 +139,7 @@ namespace RepositoryLayer.Service
                         return "Deleted Book Successfully";
                     }
                     else
-                        return "Book Not Found For Deletion";
+                        return null;
                 }
             }
             catch (Exception ex)
@@ -228,7 +228,7 @@ namespace RepositoryLayer.Service
         }
 
         /// <summary>
-        /// Method to take values from db using sql data reader to model object(UC7ToUC9)
+        /// Method to take values from db using sql data reader to model object
         /// </summary>
         /// <returns></returns>
         public BookModel ReadBooksDetails(SqlDataReader reader, BookModel bookModel)

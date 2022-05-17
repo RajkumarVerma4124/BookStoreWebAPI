@@ -13,6 +13,7 @@ CREATE TABLE Cart (
 	BookId INT NOT NULL FOREIGN KEY (BookId) REFERENCES Books(BookId),	
 );
 
+Select * From Cart
 ------------------------------------------------------------------------------------------------------------------------
 --******************************************** Add Cart Stored Procedure *********************************************--
 ------------------------------------------------------------------------------------------------------------------------
@@ -38,11 +39,12 @@ END CATCH
 ------------------------------------------------------------------------------------------------------------------------
 --******************************************** Delete Cart Stored Procedure ******************************************--
 ------------------------------------------------------------------------------------------------------------------------
-CREATE PROCEDURE spDeleteCart
-	@CartId INT
+ALTER PROCEDURE spDeleteCart
+	@CartId INT,
+	@UserId INT
 AS
 BEGIN TRY
-		DELETE FROM Cart WHERE CartId = @CartId
+		DELETE FROM Cart WHERE CartId = @CartId AND UserId= @UserId
 END TRY
 BEGIN CATCH
 SELECT
@@ -57,12 +59,13 @@ END CATCH
 ------------------------------------------------------------------------------------------------------------------------
 --******************************************** Update Cart Stored Procedure ******************************************--
 ------------------------------------------------------------------------------------------------------------------------
-CREATE PROCEDURE spUpdateCart
+ALTER PROCEDURE spUpdateCart
 	@CartId INT,
-	@BookQuantity INT
+	@BookQuantity INT,
+	@UserId INT
 AS
 BEGIN TRY
-		UPDATE Cart SET BookQuantity = @BookQuantity WHERE CartId = @CartId
+		UPDATE Cart SET BookQuantity = @BookQuantity WHERE CartId = @CartId AND UserId = @UserId 
 END TRY
 BEGIN CATCH
 SELECT
