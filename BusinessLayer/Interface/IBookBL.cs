@@ -5,6 +5,9 @@ using System.Text;
 
 namespace BusinessLayer.Interface
 {
+    /// <summary>
+    /// Created The Interface For Book Business Layer Class
+    /// </summary>
     public interface IBookBL
     {
         BookModel AddBook(AddBookModel bookModel);

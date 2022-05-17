@@ -25,7 +25,7 @@ namespace BookStoreAPI.Controllers
         /// <summary>
         /// Constructor To Initialize The Instance Of Interface ICartBL
         /// </summary>
-        /// <param name="userBL"></param>
+        /// <param name="cartBL"></param>
         public CartController(ICartBL cartBL)
         {
             this.cartBL = cartBL;
@@ -46,11 +46,11 @@ namespace BookStoreAPI.Controllers
                 var resBook = this.cartBL.AddBookToCart(cartModel, userId);
                 if (resBook != null)
                 {
-                    return Created("", new { success = true, message = "Cart Added Successfully", data = resBook });
+                    return Created("", new { success = true, message = "Book Added To Cart Successfully", data = resBook });
                 }
                 else
                 {
-                    return BadRequest(new { success = false, message = "Cart Addition Failed" });
+                    return BadRequest(new { success = false, message = "Book Addition To Cart Failed" });
                 }
             }
             catch (Exception ex)

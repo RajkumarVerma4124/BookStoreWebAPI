@@ -142,6 +142,11 @@ namespace RepositoryLayer.Service
             }
         }
 
+        /// <summary>
+        /// Method To Get All Cart Details
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public IList<CartResponseModel> GetAllCartDetails(int userId)
         {
             try

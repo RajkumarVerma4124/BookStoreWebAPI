@@ -5,6 +5,9 @@ using System.Text;
 
 namespace BusinessLayer.Interface
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public interface ICartBL
     {
         AddCartModel AddBookToCart(AddCartModel cartModel, int userId);

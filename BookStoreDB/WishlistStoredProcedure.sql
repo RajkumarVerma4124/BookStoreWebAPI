@@ -12,16 +12,27 @@ CREATE TABLE Wishlist (
 	BookId INT NOT NULL FOREIGN KEY (BookId) REFERENCES Books(BookId)	
 );
 
+Select * From Wishlist
 ------------------------------------------------------------------------------------------------------------------------
 --******************************************** Add To Wishlist Stored Procedure **************************************--
 ------------------------------------------------------------------------------------------------------------------------
-CREATE PROCEDURE spAddWishlist
+ALTER PROCEDURE spAddWishlist
 	-- Add the parameters for the stored procedure here
 	@UserId INT,
 	@BookId INT
 AS
 BEGIN TRY
-	INSERT INTO Wishlist VALUES (@UserId,@BookId)
+	IF EXISTS(SELECT * FROM Wishlist WHERE BookId = @BookId AND UserId = @UserId)
+		SELECT 1;
+	ELSE
+	BEGIN
+		IF EXISTS(SELECT * FROM Books WHERE BookId = @BookId)
+		BEGIN
+			INSERT INTO Wishlist VALUES (@UserId,@BookId)
+		END
+		ELSE
+			SELECT 2;
+	END
 END TRY
 BEGIN CATCH
 SELECT

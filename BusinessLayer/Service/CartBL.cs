@@ -8,7 +8,7 @@ using System.Text;
 namespace BusinessLayer.Service
 {
     /// <summary>
-    /// Created The User Business Layer Class To Implement IUserBL Methods
+    /// Created The User Business Layer Class To Implement ICartBL Methods
     /// </summary>
     public class CartBL : ICartBL
     {
