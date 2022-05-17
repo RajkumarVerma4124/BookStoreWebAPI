@@ -4,26 +4,24 @@
 use BookStoreDB;
 
 ------------------------------------------------------------------------------------------------------------------------
---******************************************** Creating Cart Table ***************************************************--
+--******************************************** Creating Wishlist Table ***********************************************--
 ------------------------------------------------------------------------------------------------------------------------
-CREATE TABLE Cart (
-	CartId INT IDENTITY(1,1) NOT NULL  PRIMARY KEY,
-	BookQuantity INT DEFAULT 1,
+CREATE TABLE Wishlist (
+	WishlistId INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
 	UserId INT NOT NULL FOREIGN KEY (UserId) REFERENCES Users(UserId),
-	BookId INT NOT NULL FOREIGN KEY (BookId) REFERENCES Books(BookId),	
+	BookId INT NOT NULL FOREIGN KEY (BookId) REFERENCES Books(BookId)	
 );
 
 ------------------------------------------------------------------------------------------------------------------------
---******************************************** Add Cart Stored Procedure *********************************************--
+--******************************************** Add To Wishlist Stored Procedure **************************************--
 ------------------------------------------------------------------------------------------------------------------------
-CREATE PROCEDURE spAddBookToCart
+CREATE PROCEDURE spAddWishlist
 	-- Add the parameters for the stored procedure here
-	@BookQuantity INT,
 	@UserId INT,
 	@BookId INT
 AS
 BEGIN TRY
-	INSERT INTO CART VALUES (@BookQuantity,@UserId,@BookId)
+	INSERT INTO Wishlist VALUES (@UserId,@BookId)
 END TRY
 BEGIN CATCH
 SELECT
@@ -36,13 +34,13 @@ SELECT
 END CATCH
 
 ------------------------------------------------------------------------------------------------------------------------
---******************************************** Delete Cart Stored Procedure ******************************************--
+--***************************************** Delete Wishlist Stored Procedure *****************************************--
 ------------------------------------------------------------------------------------------------------------------------
-CREATE PROCEDURE spDeleteCart
-	@CartId INT
+CREATE PROCEDURE spDeleteWishlist
+	@WishlistId INT
 AS
 BEGIN TRY
-		DELETE FROM Cart WHERE CartId = @CartId
+		DELETE FROM Wishlist WHERE WishlistId = @WishlistId
 END TRY
 BEGIN CATCH
 SELECT
@@ -55,37 +53,16 @@ SELECT
 END CATCH
 
 ------------------------------------------------------------------------------------------------------------------------
---******************************************** Update Cart Stored Procedure ******************************************--
+--******************************************** Get All Wishlist Stored Procedure ************************************--
 ------------------------------------------------------------------------------------------------------------------------
-CREATE PROCEDURE spUpdateCart
-	@CartId INT,
-	@BookQuantity INT
-AS
-BEGIN TRY
-		UPDATE Cart SET BookQuantity = @BookQuantity WHERE CartId = @CartId
-END TRY
-BEGIN CATCH
-SELECT
-	ERROR_NUMBER() AS ErrorNumber,
-	ERROR_SEVERITY() AS ErrorSeverity,
-	ERROR_STATE() AS ErrorState,
-	ERROR_PROCEDURE() AS ErrorProcedure,
-	ERROR_LINE() AS ErrorLine,
-	ERROR_MESSAGE() AS ErrorMessage;
-END CATCH
-
-------------------------------------------------------------------------------------------------------------------------
---******************************************** Get Cart Stored Procedure *********************************************--
----------------------------------------------------------------------------------------------------------------------------
-
-ALTER PROCEDURE sp_GetCartDetails
-		@UserId INT
+CREATE PROCEDURE sp_GetAllWishlist
+	@UserId INT
 AS
 BEGIN TRY
 	SELECT
-		Cart.CartId, Cart.UserId, Cart.BookId, Cart.BookQuantity,	
-		Books.BookName, Books.AuthorName, Books.DiscountPrice, Books.ActualPrice, Books.BookImage
-	FROM Cart INNER JOIN Books ON Cart.BookId = Books.BookId WHERE UserId=@UserId;
+		w.WishlistId, w.UserId, w.BookId,	
+		b.BookName, b.AuthorName, b.DiscountPrice, b.ActualPrice, b.BookImage
+	FROM Wishlist w INNER JOIN Books b ON w.BookId = b.BookId WHERE UserId=@UserId;
 END TRY
 BEGIN CATCH
 SELECT
@@ -96,6 +73,3 @@ SELECT
 	ERROR_LINE() AS ErrorLine,
 	ERROR_MESSAGE() AS ErrorMessage;
 END CATCH
-
-
-
