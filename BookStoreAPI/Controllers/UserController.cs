@@ -32,9 +32,8 @@ namespace BookStoreAPI.Controllers
         /// <summary>
         /// Post Request For Registering A New User (POST: /api/user/register)
         /// </summary>
-        /// <param name="userReg"></param>
+        /// <param name="userModel"></param>
         /// <returns></returns>
-        /// <exception cref="AppException"></exception>
         [HttpPost("Register")]
         public IActionResult Register(UserModel userModel)
         {
@@ -87,7 +86,6 @@ namespace BookStoreAPI.Controllers
         /// </summary>
         /// <param name="emailId"></param>
         /// <returns></returns>
-        /// <exception cref="KeyNotFoundException"></exception>
         [HttpPost("ForgotPassword")]
         public IActionResult ForgotPassword(ForgotPasswordModel forgotPass)
         {
@@ -114,7 +112,6 @@ namespace BookStoreAPI.Controllers
         /// </summary>
         /// <param name="resetPassword"></param>
         /// <returns></returns>
-        /// <exception cref="AppException"></exception>
         [HttpPatch("ResetPassword")]
         [Authorize]  //👈 For Authorized User Only
         public IActionResult ResetPassword(ResetPasswordModel resetPassword)
