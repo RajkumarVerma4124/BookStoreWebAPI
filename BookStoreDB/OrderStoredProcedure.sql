@@ -34,25 +34,32 @@ AS
 BEGIN TRY
 	IF (EXISTS(SELECT * FROM Books WHERE BookId = @BookId))
 	BEGIN
-		BEGIN TRY
-			BEGIN TRANSACTION	
-				SELECT @DiscountPrice = DiscountPrice FROM Books WHERE BookId = @BookId;
-				SELECT @ActualPrice = ActualPrice FROM Books WHERE BookId = @BookId;
-				SELECT @BookQuantity = BookQuantity FROM Cart Where BookId = @BookId AND UserId = @UserId;	
-				SELECT @InitialBookQuantity = BookQuantity - @BookQuantity FROM Books WHERE BookId = @BookId;
-				IF(@InitialBookQuantity < 0)
-				BEGIN
-					SELECT 3
-				END
-				ELSE
-					INSERT INTO BookOrders VALUES (@BookQuantity*@DiscountPrice, @BookQuantity*@ActualPrice, @BookQuantity, GETDATE(), @UserId, @BookId, @AddressId)
-					UPDATE Books SET BookQuantity = BookQuantity - @BookQuantity
-					DELETE FROM Cart WHERE UserId = @UserId
-			COMMIT TRANSACTION
-		END TRY
-		BEGIN CATCH
-			ROLLBACK TRANSACTION
-		END CATCH
+		IF EXISTS (SELECT * FROM Address WHERE AddressId = @AddressId)
+		BEGIN
+			BEGIN TRY
+				BEGIN TRANSACTION	
+					SELECT @DiscountPrice = DiscountPrice FROM Books WHERE BookId = @BookId;
+					SELECT @ActualPrice = ActualPrice FROM Books WHERE BookId = @BookId;
+					SELECT @BookQuantity = BookQuantity FROM Cart Where BookId = @BookId AND UserId = @UserId;	
+					SELECT @InitialBookQuantity = BookQuantity - @BookQuantity FROM Books WHERE BookId = @BookId;
+					IF(@InitialBookQuantity < 0)
+					BEGIN
+						SELECT 3
+					END
+					ELSE
+						INSERT INTO BookOrders VALUES (@BookQuantity*@DiscountPrice, @BookQuantity*@ActualPrice, @BookQuantity, GETDATE(), @UserId, @BookId, @AddressId)
+						UPDATE Books SET BookQuantity = BookQuantity - @BookQuantity
+						DELETE FROM Cart WHERE UserId = @UserId
+				COMMIT TRANSACTION
+			END TRY	
+			BEGIN CATCH
+				ROLLBACK TRANSACTION
+			END CATCH
+		END 
+		ELSE
+		BEGIN
+			Select 1
+		END	
 	END 
 	ELSE
 	BEGIN
@@ -77,8 +84,9 @@ CREATE OR ALTER PROCEDURE spGetAllOrders
 AS
 BEGIN TRY
 	SELECT 
-		Books.BookId,Books.BookName,Books.AuthorName,Books.BookImage,
-		BookOrders.OrderId, BookOrders.OrderDate, BookOrders.ActualTotalPrice, BookOrders.OrderTotalPrice
+		Books.BookName,Books.AuthorName,Books.BookImage,
+		BookOrders.OrderId, BookOrders.OrderDate, BookOrders.ActualTotalPrice, BookOrders.OrderTotalPrice, 
+		BookOrders.UserId, BookOrders.BookId, BookOrders.AddressId, BookOrders.BookQuantity
 		FROM Books INNER JOIN BookOrders ON BookOrders.BookId=Books.BookId 
 		WHERE BookOrders.UserId=@UserId
 END TRY

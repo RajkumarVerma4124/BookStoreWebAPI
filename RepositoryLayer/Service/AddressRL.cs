@@ -174,7 +174,7 @@ namespace RepositoryLayer.Service
                         while (reader.Read())
                         {
                             AddressResponse addrModel = new AddressResponse();
-                            addrRes = ReadCartDetails(reader, addrModel);
+                            addrRes = ReadAddressDetails(reader, addrModel);
                             addrList.Add(addrRes);
                         }
                         sqlConnection.Close();
@@ -218,7 +218,7 @@ namespace RepositoryLayer.Service
                         while (reader.Read())
                         {
                             AddressResponse addrModel = new AddressResponse();
-                            addrRes = ReadCartDetails(reader, addrModel);
+                            addrRes = ReadAddressDetails(reader, addrModel);
                             addrList.Add(addrRes);
                         }
                         sqlConnection.Close();
@@ -241,7 +241,7 @@ namespace RepositoryLayer.Service
         /// Method to take values from db using sql data reader to model object
         /// </summary>
         /// <returns></returns>
-        public AddressResponse ReadCartDetails(SqlDataReader reader, AddressResponse addrModel)
+        public AddressResponse ReadAddressDetails(SqlDataReader reader, AddressResponse addrModel)
         {
             //Storing details that are retrived
             addrModel.AddressId = Convert.ToInt32(reader["AddressId"] == DBNull.Value ? default : reader["AddressId"]);

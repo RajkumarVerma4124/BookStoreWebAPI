@@ -8,7 +8,7 @@ using System.Text;
 namespace BusinessLayer.Service
 {
     /// <summary>
-    /// Created The User Business Layer Class To Implement IAddressBL Methods
+    /// Created The Address Business Layer Class To Implement IAddressBL Methods
     /// </summary>
     public class AddressBL: IAddressBL
     {

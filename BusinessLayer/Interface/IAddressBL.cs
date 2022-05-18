@@ -6,7 +6,7 @@ using System.Text;
 namespace BusinessLayer.Interface
 {
     /// <summary>
-    /// Created The User Business Layer Interface For Address
+    /// Created The Address Business Layer Interface For Address
     /// </summary>
     public interface IAddressBL
     {
