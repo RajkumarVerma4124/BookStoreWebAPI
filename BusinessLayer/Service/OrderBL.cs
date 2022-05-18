@@ -5,33 +5,32 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-
 namespace BusinessLayer.Service
 {
     /// <summary>
-    /// Created The Feedback Business Layer Class To Implement IAddressBL Methods
+    /// Created The Order Business Layer Class To Implement IOrderBL Methods
     /// </summary>
-    public class FeedbackBL: IFeedbackBL
+    public class OrderBL: IOrderBL
     {
         /// <summary>
-        /// Reference Object For Interface IFeedbackRL
+        /// Reference Object For Interface IOrderRL
         /// </summary>
-        private readonly IFeedbackRL feedbackRL;
+        private readonly IOrderRL orderRL;
 
         /// <summary>
-        /// Created Constructor With Dependency Injection For IFeedbackRL
+        /// Created Constructor With Dependency Injection For IOrderRL
         /// </summary>
         /// <param name="addressRL"></param>
-        public FeedbackBL(IFeedbackRL feedbackRL)
+        public OrderBL(IOrderRL orderRL)
         {
-            this.feedbackRL = feedbackRL;
+            this.orderRL = orderRL;
         }
 
-        public FeedbackModel AddFeedback(FeedbackModel feedback, int userId)
+        public OrderModel AddOrder(OrderModel order, int userId)
         {
             try
             {
-                return feedbackRL.AddFeedback(feedback, userId);
+                return orderRL.AddOrder(order, userId);
             }
             catch (Exception ex)
             {
@@ -39,11 +38,11 @@ namespace BusinessLayer.Service
             }
         }
 
-        public IList<FeedbackResponse> GetAllFeedbackDetails(int bookId)
+        public IList<OrderResponse> GetAllOrderDetails(int userId)
         {
             try
             {
-                return feedbackRL.GetAllFeedbackDetails(bookId);
+                return orderRL.GetAllOrderDetails(userId);
             }
             catch (Exception ex)
             {

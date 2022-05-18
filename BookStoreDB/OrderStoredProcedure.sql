@@ -32,7 +32,7 @@ AS
 	DECLARE @BookQuantity INT
 	DECLARE @InitialBookQuantity INT
 BEGIN TRY
-	IF (EXISTS(SELECT * FROM Books WHERE BookId = @BookId))
+	IF (EXISTS(SELECT * FROM Cart WHERE BookId = @BookId))
 	BEGIN
 		IF EXISTS (SELECT * FROM Address WHERE AddressId = @AddressId)
 		BEGIN
@@ -49,7 +49,7 @@ BEGIN TRY
 					ELSE
 						INSERT INTO BookOrders VALUES (@BookQuantity*@DiscountPrice, @BookQuantity*@ActualPrice, @BookQuantity, GETDATE(), @UserId, @BookId, @AddressId)
 						UPDATE Books SET BookQuantity = BookQuantity - @BookQuantity
-						DELETE FROM Cart WHERE UserId = @UserId
+						DELETE FROM Cart WHERE UserId = @UserId	And BookId = @BookId
 				COMMIT TRANSACTION
 			END TRY	
 			BEGIN CATCH
