@@ -68,7 +68,7 @@ namespace BookStoreAPI.Controllers
                 var resUser = userBL.Login(userLogin);
                 if (resUser != null)
                 {
-                    return Ok(new { success = true, message = "Login Successfully", Email = resUser.EmailId, FirstName = resUser.FullName, token = resUser.Token });
+                    return Ok(new { success = true, message = "Login Successfully", Email = resUser.EmailId, FullName = resUser.FullName, MobileNum = resUser.MobileNumber, token = resUser.Token });
                 }
                 else
                 {
