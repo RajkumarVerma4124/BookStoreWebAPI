@@ -9,7 +9,7 @@ using System.Text;
 namespace BusinessLayer.Service
 {
     /// <summary>
-    /// Created The Feedback Business Layer Class To Implement IAddressBL Methods
+    /// Created The Feedback Business Layer Class To Implement IFeedbackBL Methods
     /// </summary>
     public class FeedbackBL: IFeedbackBL
     {

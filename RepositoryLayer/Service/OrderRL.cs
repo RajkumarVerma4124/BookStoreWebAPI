@@ -69,7 +69,6 @@ namespace RepositoryLayer.Service
             }
         }
 
-
         /// <summary>
         /// Method To Get All Order Details
         /// </summary>
@@ -112,6 +111,7 @@ namespace RepositoryLayer.Service
                 sqlConnection.Close();
             }
         }
+
         /// <summary>
         /// Method to take values from db using sql data reader to model object
         /// </summary>
@@ -125,7 +125,8 @@ namespace RepositoryLayer.Service
             orderModel.AddressId = Convert.ToInt32(reader["AddressId"] == DBNull.Value ? default : reader["AddressId"]);
             orderModel.BookName = reader["BookName"] == DBNull.Value ? default : reader["BookName"].ToString();
             orderModel.AuthorName = reader["AuthorName"] == DBNull.Value ? default : reader["AuthorName"].ToString();
-            orderModel.OrderDate = reader["OrderDate"] == DBNull.Value ? default : reader["OrderDate"].ToString();
+            orderModel.OrderDateTime = Convert.ToDateTime(reader["OrderDate"] == DBNull.Value ? default : reader["OrderDate"].ToString());
+            orderModel.OrderDate = orderModel.OrderDateTime.ToString("dd-MM-yyyy");
             orderModel.BookImage = reader["BookImage"] == DBNull.Value ? default : reader["BookImage"].ToString();
             orderModel.BookQuantity = Convert.ToInt32(reader["BookQuantity"] == DBNull.Value ? default : reader["BookQuantity"]);
             orderModel.OrderTotalPrice = Math.Round(Convert.ToDouble(reader["OrderTotalPrice"] == DBNull.Value ? default : reader["OrderTotalPrice"]), 2);

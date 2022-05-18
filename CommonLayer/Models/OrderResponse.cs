@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace CommonLayer.Models
 {
@@ -13,6 +14,8 @@ namespace CommonLayer.Models
         public string AuthorName { get; set; }
         public string BookImage { get; set; }
         public int OrderId { get; set; }
+        [JsonIgnore]
+        public DateTime OrderDateTime { get; set; }
         public object OrderDate { get; set; }
         public double OrderTotalPrice { get; set; }
         public double ActualTotalPrice { get; set; }

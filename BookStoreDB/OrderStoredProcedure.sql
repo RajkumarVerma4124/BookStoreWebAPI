@@ -17,7 +17,7 @@ CREATE TABLE BookOrders (
 	AddressId INT NOT NULL FOREIGN KEY (AddressId) REFERENCES Address(AddressId),
 );
 
-SELECT * FROM BookOrders
+	SELECT * FROM BookOrders
 
 ------------------------------------------------------------------------------------------------------------------------
 --********************************************** Creating Add Order Procedure *****************************************--
@@ -48,7 +48,7 @@ BEGIN TRY
 					END
 					ELSE
 						INSERT INTO BookOrders VALUES (@BookQuantity*@DiscountPrice, @BookQuantity*@ActualPrice, @BookQuantity, GETDATE(), @UserId, @BookId, @AddressId)
-						UPDATE Books SET BookQuantity = BookQuantity - @BookQuantity
+						UPDATE Books SET BookQuantity = BookQuantity - @BookQuantity FROM Books WHERE BookId = @BookId;
 						DELETE FROM Cart WHERE UserId = @UserId	And BookId = @BookId
 				COMMIT TRANSACTION
 			END TRY	
