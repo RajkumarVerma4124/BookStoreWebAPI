@@ -5,6 +5,9 @@ using System.Text;
 
 namespace RepositoryLayer.Interface
 {
+    /// <summary>
+    /// Created The Interface For Cart
+    /// </summary>
     public interface ICartRL
     {
         AddCartModel AddBookToCart(AddCartModel cartModel, int userId);

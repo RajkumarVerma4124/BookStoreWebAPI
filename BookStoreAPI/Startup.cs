@@ -40,6 +40,8 @@ namespace BookStoreAPI
             services.AddTransient<ICartRL, CartRL>();
             services.AddTransient<IWishlistBL, WishlistBL>();
             services.AddTransient<IWishlistRL, WishlistRL>();
+            services.AddTransient<IAddressBL, AddressBL>();
+            services.AddTransient<IAddressRL, AddressRL>();
             services.AddControllers();
             ConfigureSwagger(services);
             services.AddAuthentication(au =>

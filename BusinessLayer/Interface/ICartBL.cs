@@ -6,7 +6,7 @@ using System.Text;
 namespace BusinessLayer.Interface
 {
     /// <summary>
-    /// 
+    /// Created The User Business Layer Interface For Cart
     /// </summary>
     public interface ICartBL
     {

@@ -72,7 +72,9 @@ CREATE OR ALTER PROCEDURE spUpdateAddress
 	@TypeId INT
 AS
 BEGIN TRY
-	If EXISTS(SELECT * FROM AddressType WHERE TypeId=@TypeId)
+	IF EXISTS(SELECT * FROM AddressType WHERE TypeId=@TypeId)
+	BEGIN
+		IF EXISTS(SELECT * FROM Address WHERE AddressId = @AddressId)
 		BEGIN
 			UPDATE Address SET 
 				Address = @Address, 
@@ -81,10 +83,15 @@ BEGIN TRY
 				TypeId = @TypeId
 			WHERE AddressId = @AddressId
 		END
-	Else
+		Else
 		BEGIN
-			SELECT 2
+			SELECT 1
 		END
+	END
+	Else
+	BEGIN
+		SELECT 2
+	END
 END TRY
 BEGIN CATCH
 SELECT
@@ -117,7 +124,7 @@ End CATCH
 ------------------------------------------------------------------------------------------------------------------------
 --**************************************** Creating Get Address Stored Procedure ************************************----
 -------------------------------------------------------------------------------------------------------------------------
-CREATE PROCEDURE spGetAddress
+CREATE OR ALTER PROCEDURE spGetAddress
 	@UserId INT,
 	@TypeId INT
 AS

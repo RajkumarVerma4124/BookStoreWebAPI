@@ -47,7 +47,7 @@ BEGIN TRY
 				ELSE
 					INSERT INTO BookOrders VALUES (@BookQuantity*@DiscountPrice, @BookQuantity*@ActualPrice, @BookQuantity, GETDATE(), @UserId, @BookId, @AddressId)
 					UPDATE Books SET BookQuantity = BookQuantity - @BookQuantity
-					DELETE FROM Cart WHERE BookId = @BookId and UserId = @UserId
+					DELETE FROM Cart WHERE UserId = @UserId
 			COMMIT TRANSACTION
 		END TRY
 		BEGIN CATCH
