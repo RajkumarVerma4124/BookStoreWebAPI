@@ -64,7 +64,7 @@ namespace BookStoreAPI.Controllers
         /// </summary>
         /// <param name="bookid"></param>
         /// <returns></returns>
-        [HttpPost("GetAll")]
+        [HttpGet("GetAll")]
         public IActionResult GetAllFeedbackDetails(int bookid)
         {
             try

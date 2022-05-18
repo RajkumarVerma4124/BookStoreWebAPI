@@ -62,7 +62,7 @@ namespace BookStoreAPI.Controllers
         /// Post Request For Getting All Orders (POST: /api/order/getall)
         /// </summary>
         /// <returns></returns>
-        [HttpPost("GetAll")]
+        [HttpGet("GetAll")]
         public IActionResult GetAllOrderDetails()
         {
             try

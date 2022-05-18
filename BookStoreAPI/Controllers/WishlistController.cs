@@ -88,7 +88,7 @@ namespace BookStoreAPI.Controllers
         /// Post Request For Getting All Wishlist Details (POST: /api/wishlist/getall)
         /// </summary>
         /// <returns></returns>
-        [HttpPost("GetAll")]
+        [HttpGet("GetAll")]
         public IActionResult GetAllWishlistDetails()
         {
             try

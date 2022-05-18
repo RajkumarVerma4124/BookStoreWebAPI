@@ -121,7 +121,7 @@ namespace BookStoreAPI.Controllers
         /// Post Request For Getting All Carts Details (POST: /api/book/getall)
         /// </summary>
         /// <returns></returns>
-        [HttpPost("GetAll")]
+        [HttpGet("GetAll")]
         public IActionResult GetAllCartDetails()
         {
             try

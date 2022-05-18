@@ -118,7 +118,7 @@ namespace BookStoreAPI.Controllers
         /// Post Request For Getting Address (POST: /api/address/get)
         /// </summary>
         /// <returns></returns>
-        [HttpPost("Get")]
+        [HttpGet("Get")]
         public IActionResult GetAddressDetails(int typeId)
         {
             try
@@ -145,7 +145,7 @@ namespace BookStoreAPI.Controllers
         /// Post Request For Getting All Address (POST: /api/address/getall)
         /// </summary>
         /// <returns></returns>
-        [HttpPost("GetAll")]
+        [HttpGet("GetAll")]
         public IActionResult GetAllAddressDetails()
         {
             try
