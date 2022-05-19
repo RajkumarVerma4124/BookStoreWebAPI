@@ -10,6 +10,5 @@ namespace CommonLayer.Models
     public class OrderModel
     {
         public int AddressId { get; set; }
-        public int BookId { get; set; }
     }
 }

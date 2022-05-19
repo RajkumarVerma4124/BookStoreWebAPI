@@ -50,7 +50,7 @@ namespace RepositoryLayer.Service
                 try
                 {
                     IList<CartResponseModel> cartList = new List<CartResponseModel>();
-                    IList<string> returnString = new List<string>();
+                    IList<string> orderSuccess = new List<string>();
                     command = new SqlCommand("sp_GetCartDetails", sqlConnection);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@UserId", userId);
@@ -79,7 +79,7 @@ namespace RepositoryLayer.Service
                             int result = Convert.ToInt32(command.ExecuteScalar());
                             if (result != 2 && result != 1 && result != 3)
                             {
-                                returnString.Add("Order Purchased Succesfully");
+                                orderSuccess.Add("Order Purchased Succesfully");
                             }
                             else
                             {
@@ -89,7 +89,7 @@ namespace RepositoryLayer.Service
                         }
                         sqlTransaction.Commit();
                         sqlConnection.Close();
-                        return returnString;
+                        return orderSuccess;
                     }
                     else
                         return null;
