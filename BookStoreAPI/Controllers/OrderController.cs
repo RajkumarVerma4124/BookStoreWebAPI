@@ -46,7 +46,7 @@ namespace BookStoreAPI.Controllers
                 var resBookOrder = this.orderBL.AddOrder(order, userId);
                 if (resBookOrder != null)
                 {
-                    return Created("", new { success = true, message = "Order Placed Successfully", data = resBookOrder });
+                    return Created("", new { success = true, message = resBookOrder[0] });
                 }
                 else
                 {

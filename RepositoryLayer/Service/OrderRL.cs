@@ -12,7 +12,7 @@ namespace RepositoryLayer.Service
     /// <summary>
     /// Created The Class For Order Repository Layer
     /// </summary>
-    public class OrderRL: IOrderRL
+    public class OrderRL : IOrderRL
     {
         /// <summary>
         /// Reference Object For Sqlconnection and Iconfiguartion
@@ -35,37 +35,74 @@ namespace RepositoryLayer.Service
         /// <param name="order"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public OrderModel AddOrder(OrderModel order, int userId)
+        public IList<string> AddOrder(OrderModel order, int userId)
         {
-            try
+            using (sqlConnection = new SqlConnection(configuration["ConnectionString:BookStoreDB"]))
             {
-                using (sqlConnection = new SqlConnection(configuration["ConnectionString:BookStoreDB"]))
+                //Open the connection
+                sqlConnection.Open();
+                //Start a local transactions
+                SqlTransaction sqlTransaction = sqlConnection.BeginTransaction();
+                //Enlist a command int the current transaction
+                SqlCommand command = sqlConnection.CreateCommand();
+                //Setting the command to transaction
+                command.Transaction = sqlTransaction;
+                try
                 {
-                    SqlCommand command = new SqlCommand("spAddOrders", sqlConnection);
+                    IList<CartResponseModel> cartList = new List<CartResponseModel>();
+                    IList<string> returnString = new List<string>();
+                    command = new SqlCommand("sp_GetCartDetails", sqlConnection);
                     command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@AddressId", order.AddressId);
-                    command.Parameters.AddWithValue("@BookId", order.BookId);
                     command.Parameters.AddWithValue("@UserId", userId);
-                    sqlConnection.Open();
-                    int result = Convert.ToInt32(command.ExecuteScalar());
-                    sqlConnection.Close();
-                    if (result != 2 && result != 1 && result != 3)
+                    command.Transaction = sqlTransaction;
+                    SqlDataReader reader = command.ExecuteReader();
+                    if (reader.HasRows)
                     {
-                        return order;
+                        //Will Loop until rows are null
+                        while (reader.Read())
+                        {
+                            CartResponseModel model = new CartResponseModel();
+                            model.UserId = Convert.ToInt32(reader["UserId"] == DBNull.Value ? default : reader["UserId"]);
+                            model.BookId = Convert.ToInt32(reader["BookId"] == DBNull.Value ? default : reader["BookId"]);
+                            cartList.Add(model);
+                        }
+                        //Closing the reader
+                        reader.Close();//Closing the reader
+                        foreach (var cart in cartList)
+                        {
+                            command = new SqlCommand("spAddOrders", sqlConnection);
+                            command.CommandType = CommandType.StoredProcedure;
+                            command.Parameters.AddWithValue("@AddressId", order.AddressId);
+                            command.Parameters.AddWithValue("@BookId", cart.BookId);
+                            command.Parameters.AddWithValue("@UserId", cart.UserId);
+                            command.Transaction = sqlTransaction;
+                            int result = Convert.ToInt32(command.ExecuteScalar());
+                            if (result != 2 && result != 1 && result != 3)
+                            {
+                                returnString.Add("Order Purchased Succesfully");
+                            }
+                            else
+                            {
+                                sqlTransaction.Rollback();
+                                return null;
+                            }
+                        }
+                        sqlTransaction.Commit();
+                        sqlConnection.Close();
+                        return returnString;
                     }
                     else
-                    {
                         return null;
-                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                sqlConnection.Close();
+                catch (Exception ex)
+                {
+                    sqlTransaction.Rollback();
+                    throw ex;
+                }
+                finally
+                {
+                    sqlConnection.Close();
+                }
             }
         }
 

@@ -10,7 +10,7 @@ namespace RepositoryLayer.Interface
     /// </summary>
     public interface IOrderRL
     {
-        OrderModel AddOrder(OrderModel order, int userId);
+        IList<string> AddOrder(OrderModel order, int userId);
         IList<OrderResponse> GetAllOrderDetails(int userId);
     }
 }

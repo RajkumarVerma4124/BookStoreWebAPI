@@ -11,7 +11,7 @@ namespace BusinessLayer.Interface
     /// </summary>
     public interface IOrderBL
     {
-        OrderModel AddOrder(OrderModel order, int userId);
+        IList<string> AddOrder(OrderModel order, int userId);
         IList<OrderResponse> GetAllOrderDetails(int userId);
     }
 }

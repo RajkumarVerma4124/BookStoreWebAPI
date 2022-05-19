@@ -117,7 +117,6 @@ namespace BookStoreAPI.Controllers
         /// <param name="bookId"></param>
         /// <returns></returns>
         [HttpGet("Get")]
-        [Authorize]
         public IActionResult GetBookById(int bookId)
         {
             try
@@ -145,7 +144,6 @@ namespace BookStoreAPI.Controllers
         /// <param name="bookId"></param>
         /// <returns></returns>
         [HttpGet("GetAll")]
-        [Authorize]
         public IActionResult GetAllBooks()
         {
             try

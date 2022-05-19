@@ -129,7 +129,7 @@ namespace BookStoreAPI.Controllers
                 //Getting The Id Of Authorized User Using Claims Of Jwt
                 int userId = Convert.ToInt32(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
                 var resCartlist = this.cartBL.GetAllCartDetails(userId);
-                if (resCartlist.Count() > 0)
+                if (resCartlist !=  null)
                 {
                     return Ok(new { success = true, message = "Got All The Cart Details Succesfully", data = resCartlist });
                 }
