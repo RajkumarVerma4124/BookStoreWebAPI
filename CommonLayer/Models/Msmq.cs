@@ -67,7 +67,7 @@ namespace CommonLayer.Models
                                     $"<h3 style = \"color:#8AB411;\"> For Resetting Password Copy The Issued Token</h3>" +
                                     $"<h3 style = \"color:#8AB411;\"> And Paste In Your Swagger Dashboard</h3>" +
                                     $"<p style = \"color:#00802b; text-decoration: none; font-size:15px;\">{token}</p>\n" +
-                                    $"<h3 style = \"color:#8AB411;margin-bottom:5px;\"><blink>This Token Will be Valid For Next 6 Hours<blink></h3>" +
+                                    $"<h3 style = \"color:#8AB411;margin-bottom:5px;\"><blink>This Token Will be Valid For Next 24 Hours<blink></h3>" +
                                     $"</body>" +
                                     $"</html>";
 

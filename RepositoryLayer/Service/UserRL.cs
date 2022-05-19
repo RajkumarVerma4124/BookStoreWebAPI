@@ -300,14 +300,15 @@ namespace RepositoryLayer.Service
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
                 var claims = new[]
                 {
-                new Claim(ClaimTypes.Email, emailId),
-                new Claim("UserId", userId.ToString())
+                    new Claim(ClaimTypes.Role, "User"),
+                    new Claim(ClaimTypes.Email, emailId),
+                    new Claim("UserId", userId.ToString())
                 };
                 var token = new JwtSecurityToken(
                   issuer: configuration["Jwt:Issuer"],
                   audience: configuration["Jwt:Audience"],
                   claims,
-                  expires: DateTime.Now.AddHours(6),
+                  expires: DateTime.Now.AddHours(24),
                   signingCredentials: credentials
                 );
                 return new JwtSecurityTokenHandler().WriteToken(token);

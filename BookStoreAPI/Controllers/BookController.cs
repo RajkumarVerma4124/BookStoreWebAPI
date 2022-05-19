@@ -14,7 +14,6 @@ namespace BookStoreAPI.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class BookController : ControllerBase
     {
         /// <summary>
@@ -37,6 +36,7 @@ namespace BookStoreAPI.Controllers
         /// <param name="bookModel"></param>
         /// <returns></returns>
         [HttpPost("Add")]
+        [Authorize(Roles = Role.Admin)]
         public IActionResult AddBook(AddBookModel bookModel)
         {
             try
@@ -63,6 +63,7 @@ namespace BookStoreAPI.Controllers
         /// <param name="bookModel"></param>
         /// <returns></returns>
         [HttpPut("Update")]
+        [Authorize(Roles = Role.Admin)]
         public IActionResult UpdateBook(BookModel bookModel)
         {
             try
@@ -89,6 +90,7 @@ namespace BookStoreAPI.Controllers
         /// <param name="bookModel"></param>
         /// <returns></returns>
         [HttpDelete("Delete")]
+        [Authorize(Roles = Role.Admin)]
         public IActionResult DeleteBook(int bookId)
         {
             try
@@ -115,6 +117,7 @@ namespace BookStoreAPI.Controllers
         /// <param name="bookId"></param>
         /// <returns></returns>
         [HttpGet("Get")]
+        [Authorize]
         public IActionResult GetBookById(int bookId)
         {
             try
@@ -142,6 +145,7 @@ namespace BookStoreAPI.Controllers
         /// <param name="bookId"></param>
         /// <returns></returns>
         [HttpGet("GetAll")]
+        [Authorize]
         public IActionResult GetAllBooks()
         {
             try

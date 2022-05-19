@@ -7,7 +7,7 @@ use BookStoreDB;
 --******************************************** Creating Cart Table ***************************************************--
 ------------------------------------------------------------------------------------------------------------------------
 CREATE TABLE Cart (
-	CartId INT IDENTITY(1,1) NOT NULL  PRIMARY KEY,
+	CartId INT IDENTITY(1,1) PRIMARY KEY,
 	BookQuantity INT DEFAULT 1,
 	UserId INT NOT NULL FOREIGN KEY (UserId) REFERENCES Users(UserId),
 	BookId INT NOT NULL FOREIGN KEY (BookId) REFERENCES Books(BookId),	
@@ -17,14 +17,21 @@ Select * From Cart
 ------------------------------------------------------------------------------------------------------------------------
 --******************************************** Add Cart Stored Procedure *********************************************--
 ------------------------------------------------------------------------------------------------------------------------
-CREATE PROCEDURE spAddBookToCart
+CREATE OR ALTER PROCEDURE spAddBookToCart
 	-- Add the parameters for the stored procedure here
 	@BookQuantity INT,
 	@UserId INT,
 	@BookId INT
 AS
 BEGIN TRY
-	INSERT INTO CART VALUES (@BookQuantity,@UserId,@BookId)
+	IF EXISTS(SELECT * FROM CART WHERE UserId = @UserId AND BookId = @BookId)
+	BEGIN
+		UPDATE Cart SET BookQuantity = BookQuantity + @BookQuantity WHERE UserId = @UserId AND BookId = @BookId 
+	END
+	ELSE
+	BEGIN
+		INSERT INTO Cart VALUES (@BookQuantity,@UserId,@BookId)
+	END
 END TRY
 BEGIN CATCH
 SELECT

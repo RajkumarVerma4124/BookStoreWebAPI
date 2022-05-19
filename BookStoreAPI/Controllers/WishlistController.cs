@@ -11,6 +11,7 @@ using System.Security.Claims;
 namespace BookStoreAPI.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize(Roles = Role.User)]
     [ApiController]
     public class WishlistController : ControllerBase
     {

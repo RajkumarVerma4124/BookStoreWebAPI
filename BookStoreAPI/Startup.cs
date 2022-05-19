@@ -46,8 +46,15 @@ namespace BookStoreAPI
             services.AddTransient<IFeedbackRL, FeedbackRL>();
             services.AddTransient<IOrderBL, OrderBL>();
             services.AddTransient< IOrderRL, OrderRL>();
+            services.AddTransient<IAdminBL, AdminBL>();
+            services.AddTransient<IAdminRL, AdminRL>();
             services.AddControllers();
             ConfigureSwagger(services);
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("RequireUserRole", policy => policy.RequireRole("User"));
+            });
             services.AddAuthentication(au =>
             {
                 au.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

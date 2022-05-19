@@ -113,7 +113,7 @@ namespace BookStoreAPI.Controllers
         /// <param name="resetPassword"></param>
         /// <returns></returns>
         [HttpPatch("ResetPassword")]
-        [Authorize]  //👈 For Authorized User Only
+        [Authorize(Roles = Role.User)] //👈 For Authorized User Only
         public IActionResult ResetPassword(ResetPasswordModel resetPassword)
         {
             try

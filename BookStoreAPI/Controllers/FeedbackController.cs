@@ -36,6 +36,7 @@ namespace BookStoreAPI.Controllers
         /// <param name="feedback"></param>
         /// <returns></returns>
         [HttpPost("Add")]
+        [Authorize(Roles = Role.User)]
         public IActionResult AddFeedback(FeedbackModel feedback)
         {
             try

@@ -14,6 +14,7 @@ namespace BookStoreAPI.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = Role.User)]
     public class OrderController : ControllerBase
     {
         /// <summary>

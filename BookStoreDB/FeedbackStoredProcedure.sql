@@ -7,7 +7,7 @@ use BookStoreDB;
 --********************************************** Creating Feedback  Table *********************************************--
 -------------------------------------------------------------------------------------------------------------------------
 CREATE TABLE Feedback (
-	FeedbackId INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+	FeedbackId INT IDENTITY(1,1) PRIMARY KEY,
 	Comment VARCHAR(MAX) NOT NULL,
 	Rating INT NOT NULL,
 	BookId INT NOT NULL FOREIGN KEY (BookId) REFERENCES Books(BookId),
