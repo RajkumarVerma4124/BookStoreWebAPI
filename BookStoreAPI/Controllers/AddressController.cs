@@ -3,6 +3,7 @@ using CommonLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -18,17 +19,20 @@ namespace BookStoreAPI.Controllers
     public class AddressController : ControllerBase
     {
         /// <summary>
-        /// Object Reference For Interface IAddressBL
+        /// Object Reference For Interface IAddressBL,ILogger
         /// </summary>
         private readonly IAddressBL addressBL;
+        private readonly ILogger<AddressController> logger;
 
         /// <summary>
-        /// Constructor To Initialize The Instance Of Interface IAddressBL
+        /// Constructor To Initialize The Instance Of Interface IAddressBL,ILogger
         /// </summary>
         /// <param name="addressBL"></param>
-        public AddressController(IAddressBL addressBL)
+        /// <param name="logger"></param>
+        public AddressController(IAddressBL addressBL, ILogger<AddressController> logger)
         {
             this.addressBL = addressBL;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -46,15 +50,18 @@ namespace BookStoreAPI.Controllers
                 var resAddress = this.addressBL.AddAddress(address, userId);
                 if (resAddress != null)
                 {
+                    logger.LogInformation("Address Added Successfully");
                     return Created("", new { success = true, message = "Address Added Successfully", data = resAddress });
                 }
                 else
                 {
+                    logger.LogWarning("Address Addition Failed");
                     return BadRequest(new { success = false, message = "Address Addition Failed" });
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
@@ -73,15 +80,18 @@ namespace BookStoreAPI.Controllers
                 string resAddressStr = this.addressBL.UpdateAddress(address);
                 if (!string.IsNullOrEmpty(resAddressStr))
                 {
+                    logger.LogInformation(resAddressStr);
                     return Ok(new { success = true, message = resAddressStr });
                 }
                 else
                 {
+                    logger.LogWarning("Address Not Found For Update");
                     return NotFound(new { success = false, message = "Address Not Found For Update" });
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
@@ -100,15 +110,18 @@ namespace BookStoreAPI.Controllers
                 var resAddrStr = this.addressBL.DeleteAddress(addressId);
                 if (!string.IsNullOrEmpty(resAddrStr))
                 {
+                    logger.LogInformation(resAddrStr);
                     return Ok(new { success = true, data = resAddrStr });
                 }
                 else
                 {
+                    logger.LogWarning("Address Not Found For Deletion");
                     return NotFound(new { success = false, message = "Address Not Found For Deletion" });
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
@@ -128,15 +141,48 @@ namespace BookStoreAPI.Controllers
                 var resAddrlist = this.addressBL.GetAddressDetails(userId, typeId);
                 if (resAddrlist != null)
                 {
+                    logger.LogInformation("Got The Address Details Succesfully");
                     return Ok(new { success = true, message = "Got The Address Details Succesfully", data = resAddrlist });
                 }
                 else
                 {
+                    logger.LogWarning("Address Details Not Found");
                     return NotFound(new { success = false, message = "Address Details Not Found" });
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Post Request For Getting Address (POST: /api/address/get)
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetById")]
+        public IActionResult GetAddressById(int addressId)
+        {
+            try
+            {
+                //Getting The Id Of Authorized User Using Claims Of Jwt
+                int userId = Convert.ToInt32(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                var resAddrlist = this.addressBL.GetAddressById(userId, addressId);
+                if (resAddrlist != null)
+                {
+                    logger.LogInformation("Got The Address Details Succesfully");
+                    return Ok(new { success = true, message = "Got The Address Details Succesfully", data = resAddrlist });
+                }
+                else
+                {
+                    logger.LogWarning("Address Details Not Found");
+                    return NotFound(new { success = false, message = "Address Details Not Found" });
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
@@ -155,15 +201,18 @@ namespace BookStoreAPI.Controllers
                 var resAddrlist = this.addressBL.GetAllAddressDetails(userId);
                 if (resAddrlist.Count() > 0)
                 {
+                    logger.LogInformation("Got The Address Details Succesfully");
                     return Ok(new { success = true, message = "Got The Address Details Succesfully", data = resAddrlist });
                 }
                 else
                 {
+                    logger.LogWarning("Address Details Not Found");
                     return NotFound(new { success = false, message = "Address Details Not Found" });
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }

@@ -44,7 +44,7 @@ namespace RepositoryLayer.Service
                     SqlCommand command = new SqlCommand("spAddFeedback", sqlConnection);
                     command.CommandType = CommandType.StoredProcedure;
                     command.Parameters.AddWithValue("@Comment", feedback.Comment);
-                    command.Parameters.AddWithValue("@Rating", feedback.Rating);
+                    command.Parameters.AddWithValue("@Rating", Convert.ToInt32(feedback.Rating));
                     command.Parameters.AddWithValue("@BookId", feedback.BookId);
                     command.Parameters.AddWithValue("@UserId", userId);
                     sqlConnection.Open();

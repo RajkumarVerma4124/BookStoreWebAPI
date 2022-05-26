@@ -3,6 +3,7 @@ using CommonLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Security.Claims;   
@@ -17,17 +18,20 @@ namespace BookStoreAPI.Controllers
     public class BookController : ControllerBase
     {
         /// <summary>
-        /// Object Reference For Interface IBookBL
+        /// Object Reference For Interface IBookBL,ILogger
         /// </summary>
         private readonly IBookBL bookBL;
+        private readonly ILogger<BookController> logger;
 
         /// <summary>
-        /// Constructor To Initialize The Instance Of Interface IBookBL
+        /// Constructor To Initialize The Instance Of Interface IBookBL,ILogger
         /// </summary>
         /// <param name="userBL"></param>
-        public BookController(IBookBL bookBL)
+        /// <param name="logger"></param>
+        public BookController(IBookBL bookBL, ILogger<BookController> logger)
         {
             this.bookBL = bookBL;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -44,15 +48,18 @@ namespace BookStoreAPI.Controllers
                 var resBook = this.bookBL.AddBook(bookModel);
                 if (resBook != null)
                 {
+                    logger.LogInformation("Book Added Successfully");
                     return Created("Book Added Successfully", new { success = true, data = resBook });
                 }
                 else
                 {
+                    logger.LogWarning("Book Addition Failed");
                     return BadRequest(new { success = false, message = "Book Addition Failed" });
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
@@ -71,15 +78,18 @@ namespace BookStoreAPI.Controllers
                 var resBook = this.bookBL.UpdateBook(bookModel);
                 if (resBook != null)
                 {
+                    logger.LogInformation("Updated The Book Succesfully");
                     return Ok(new { success = true, message= "Updated The Book Succesfully", data = resBook });
                 }
                 else
                 {
+                    logger.LogWarning("Book Not Found");
                     return NotFound(new { success = false, message = "Book Not Found" });
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
@@ -98,15 +108,18 @@ namespace BookStoreAPI.Controllers
                 var resBook = this.bookBL.DeleteBook(bookId);
                 if (!string.IsNullOrEmpty(resBook))
                 {
+                    logger.LogInformation(resBook);
                     return Ok(new { success = true, data = resBook });
                 }
                 else
                 {
+                    logger.LogWarning("Book Not Found For Deletion");
                     return NotFound(new { success = false, message = "Book Not Found For Deletion" });
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
@@ -124,15 +137,18 @@ namespace BookStoreAPI.Controllers
                 var resBook = this.bookBL.GetBookById(bookId);
                 if (resBook != null)
                 {
+                    logger.LogInformation("Got The Book Succesfully");
                     return Ok(new { success = true, message = "Got The Book Succesfully", data = resBook });
                 }
                 else
                 {
+                    logger.LogWarning("Book Not Found");
                     return NotFound(new { success = false, message = "Book Not Found" });
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
@@ -151,15 +167,18 @@ namespace BookStoreAPI.Controllers
                 var resBookList = this.bookBL.GetAllBooks();
                 if (resBookList.Count() > 0)
                 {
+                    logger.LogInformation("Got ALL The Book Succesfully");
                     return Ok(new { success = true, message = "Got ALL The Book Succesfully", data = resBookList });
                 }
                 else
                 {
+                    logger.LogWarning("Book Not Found");
                     return NotFound(new { success = false, message = "Books Not Found" });
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }

@@ -11,6 +11,6 @@ namespace CommonLayer.Models
     {
         public int BookId { get; set; }
         public string Comment { get; set; }
-        public int Rating { get; set; }
+        public string Rating { get; set; }
     }
 }

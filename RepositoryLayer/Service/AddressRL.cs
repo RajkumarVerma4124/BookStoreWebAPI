@@ -195,6 +195,50 @@ namespace RepositoryLayer.Service
         }
 
         /// <summary>
+        /// Method To Get Address Details
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="addressId"></param>
+        /// <returns></returns>
+        public AddressResponse GetAddressById(int userId, int addressId)
+        {
+            try
+            {
+                using (sqlConnection = new SqlConnection(configuration["ConnectionString:BookStoreDB"]))
+                {
+                    AddressResponse addrRes = null;
+                    SqlCommand command = new SqlCommand("spGetAddressById", sqlConnection);
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@UserId", userId);
+                    command.Parameters.AddWithValue("@AddressId", addressId);
+                    sqlConnection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        //Will Loop until rows are null
+                        while (reader.Read())
+                        {
+                            AddressResponse addrModel = new AddressResponse();
+                            addrRes = ReadAddressDetails(reader, addrModel);
+                        }
+                        sqlConnection.Close();
+                        return addrRes;
+                    }
+                    else
+                        return default;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                sqlConnection.Close();
+            }
+        }
+
+        /// <summary>
         /// Method To Get All Address Details
         /// </summary>
         /// <param name="userId"></param>

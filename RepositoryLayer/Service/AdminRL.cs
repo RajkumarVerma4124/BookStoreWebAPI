@@ -44,7 +44,7 @@ namespace RepositoryLayer.Service
                 using (sqlConnection = new SqlConnection(configuration["ConnectionString:BookStoreDB"]))
                 {
                     AdminResponse adminloginResponse = new AdminResponse();
-                    if (string.IsNullOrEmpty(adminLogin.Email) || string.IsNullOrEmpty(adminLogin.Password))
+                    if (string.IsNullOrEmpty(adminLogin.EmailId) || string.IsNullOrEmpty(adminLogin.Password))
                         return null;
                     else
                     {
@@ -52,7 +52,7 @@ namespace RepositoryLayer.Service
                         //Setting command type to stored procedure
                         command.CommandType = CommandType.StoredProcedure;
                         //Add parameters to stored procedures
-                        command.Parameters.AddWithValue("@Email", adminLogin.Email);
+                        command.Parameters.AddWithValue("@Email", adminLogin.EmailId);
                         command.Parameters.AddWithValue("@Password", adminLogin.Password);
                         //Open Sql Connection
                         sqlConnection.Open();

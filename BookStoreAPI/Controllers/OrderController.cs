@@ -3,6 +3,7 @@ using CommonLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -18,17 +19,21 @@ namespace BookStoreAPI.Controllers
     public class OrderController : ControllerBase
     {
         /// <summary>
-        /// Object Reference For Interface IOrderBL
+        /// Object Reference For Interface IOrderBL,ILogger
         /// </summary>
         private readonly IOrderBL orderBL;
+        private readonly ILogger<OrderController> logger;
+
 
         /// <summary>
-        /// Constructor To Initialize The Instance Of Interface IOrderBL
+        /// Constructor To Initialize The Instance Of Interface IOrderBL,ILogger
         /// </summary>
         /// <param name="orderBL"></param>
-        public OrderController(IOrderBL orderBL)
+        /// <param name="logger"></param>
+        public OrderController(IOrderBL orderBL, ILogger<OrderController> logger)
         {
             this.orderBL = orderBL;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -46,15 +51,18 @@ namespace BookStoreAPI.Controllers
                 var resBookOrder = this.orderBL.AddOrder(order, userId);
                 if (resBookOrder != null)
                 {
+                    logger.LogInformation(resBookOrder[0]);
                     return Created("", new { success = true, message = resBookOrder[0] });
                 }
                 else
                 {
+                    logger.LogWarning("Order Addition Failed");
                     return BadRequest(new { success = false, message = "Order Addition Failed" });
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
@@ -73,15 +81,18 @@ namespace BookStoreAPI.Controllers
                 var resOrderList = this.orderBL.GetAllOrderDetails(userId);
                 if (resOrderList != null)
                 {
+                    logger.LogInformation("Got All The Order Details Succesfully");
                     return Ok(new { success = true, message = "Got All The Order Details Succesfully", data = resOrderList });
                 }
                 else
                 {
+                    logger.LogWarning("Order Details Not Found");
                     return NotFound(new { success = false, message = "Order Details Not Found" });
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }

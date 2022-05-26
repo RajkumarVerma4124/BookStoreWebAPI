@@ -3,6 +3,7 @@ using CommonLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Security.Claims;
 
@@ -13,17 +14,21 @@ namespace BookStoreAPI.Controllers
     public class AdminController : ControllerBase
     {
         /// <summary>
-        /// Object Reference For Interface IAdminBL
+        /// Object Reference For Interface IAdminBL,ILogger
         /// </summary>
         private readonly IAdminBL adminBL;
+        private readonly ILogger<AdminController> logger;
+
 
         /// <summary>
-        /// Constructor To Initialize The Instance Of Interface IAdminBL
+        /// Constructor To Initialize The Instance Of Interface IAdminBL,ILogger
         /// </summary>
         /// <param name="adminBL"></param>
-        public AdminController(IAdminBL adminBL)
+        /// <param name="logger"></param>
+        public AdminController(IAdminBL adminBL, ILogger<AdminController> logger)
         {
             this.adminBL = adminBL;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -39,16 +44,19 @@ namespace BookStoreAPI.Controllers
                 var resAdmin = adminBL.AdminLogin(adminLogin);
                 if (resAdmin != null)
                 {
-                    return Ok(new { success = true, message = "Admin Login Successfully", data = resAdmin });
+                    logger.LogInformation("Admin Login Successfull");
+                    return Ok(new { success = true, message = "Admin Login Successfull", data = resAdmin });
                 }
                 else
                 {
+                    logger.LogWarning("Admin Login Failed Check EmailId And Password");
                     return BadRequest(new { success = false, message = "Admin Login Failed Check EmailId And Password" });
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return BadRequest(new { success = false, message = ex.Message });
+                logger.LogError("Admin Login Failed Check EmailId And Password");
+                return BadRequest(new { success = false, message = "Admin Login Failed Check EmailId And Password" });
             }
         }
     }

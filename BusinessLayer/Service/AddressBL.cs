@@ -50,6 +50,18 @@ namespace BusinessLayer.Service
             }
         }
 
+        public AddressResponse GetAddressById(int userId, int addressId)
+        {
+            try
+            {
+                return addressRL.GetAddressById(userId, addressId);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public IList<AddressResponse> GetAddressDetails(int userId, int typeId)
         {
             try

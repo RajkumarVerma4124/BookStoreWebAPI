@@ -64,16 +64,16 @@ namespace CommonLayer.Models
                                   $"</style>" +
                                     $"<body style = \"background-color:#DBFF73;text-align:center;padding:5px;\">" +
                                     $"<h1 style = \"color:#6A8D02; border-bottom: 3px solid #84AF08; margin-top: 5px;\"> Dear <b>{recieverName}</b> </h1>\n" +
-                                    $"<h3 style = \"color:#8AB411;\"> For Resetting Password Copy The Issued Token</h3>" +
-                                    $"<h3 style = \"color:#8AB411;\"> And Paste In Your Swagger Dashboard</h3>" +
-                                    $"<p style = \"color:#00802b; text-decoration: none; font-size:15px;\">{token}</p>\n" +
+                                    $"<h3 style = \"color:#8AB411;\"> For Resetting Password The Below Link Is Issued</h3>" +
+                                    $"<h3 style = \"color:#8AB411;\"> Please Click The Link Below To Reset Your Password</h3>" +
+                                    $"<a style = \"color:#00802b; text-decoration: none; font-size:20px;\" href='http://localhost:4200/resetpassword/{token}'>Click me</a>\n" +
                                     $"<h3 style = \"color:#8AB411;margin-bottom:5px;\"><blink>This Token Will be Valid For Next 24 Hours<blink></h3>" +
                                     $"</body>" +
                                     $"</html>";
 
                 mailMessage.Body = mailBody;
                 mailMessage.IsBodyHtml = true;
-                mailMessage.Subject = "Fundoo Notes Password Reset Link";
+                mailMessage.Subject = "BookStore Password Reset Link";
                 smtpClient.Send(mailMessage);
             }
             catch (Exception ex)

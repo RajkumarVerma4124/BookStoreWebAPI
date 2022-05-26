@@ -3,6 +3,7 @@ using CommonLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -16,17 +17,21 @@ namespace BookStoreAPI.Controllers
     public class WishlistController : ControllerBase
     {
         /// <summary>
-        /// Object Reference For Interface ICartBL
+        /// Object Reference For Interface ICartBL,ILogger
         /// </summary>
         private readonly IWishlistBL wishlistBL;
+        private readonly ILogger<WishlistController> logger;
+
 
         /// <summary>
-        /// Constructor To Initialize The Instance Of Interface IWishlistBL
+        /// Constructor To Initialize The Instance Of Interface IWishlistBL,ILogger
         /// </summary>
         /// <param name="wishlistBL"></param>
-        public WishlistController(IWishlistBL wishlistBL)
+        /// <param name="logger"></param>
+        public WishlistController(IWishlistBL wishlistBL, ILogger<WishlistController> logger)
         {
             this.wishlistBL = wishlistBL;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -44,15 +49,18 @@ namespace BookStoreAPI.Controllers
                 string resBook = this.wishlistBL.AddBookToWishlist(bookId, userId);
                 if (!string.IsNullOrEmpty(resBook))
                 {
+                    logger.LogInformation(resBook);
                     return Created("", new { success = true, data = resBook });
                 }
                 else
                 {
+                    logger.LogWarning("The Given Book Was Not Found");
                     return NotFound(new { success = false, message = "The Given Book Was Not Found"});
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
@@ -72,15 +80,18 @@ namespace BookStoreAPI.Controllers
                 var resBook = this.wishlistBL.DeleteWishlist(wishlistId);
                 if (!string.IsNullOrEmpty(resBook))
                 {
+                    logger.LogInformation(resBook);
                     return Ok(new { success = true, data = resBook });
                 }
                 else
                 {
+                    logger.LogWarning("Wishlist Not Found For Deletion");
                     return NotFound(new { success = false, message = "Wishlist Not Found For Deletion" });
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
@@ -99,15 +110,18 @@ namespace BookStoreAPI.Controllers
                 var resWishlist = this.wishlistBL.GetAllWishlistDetails(userId);
                 if (resWishlist.Count() > 0)
                 {
+                    logger.LogInformation("Got All The Wishlist Details Succesfully");
                     return Ok(new { success = true, message = "Got All The Wishlist Details Succesfully", data = resWishlist });
                 }
                 else
                 {
+                    logger.LogWarning("Wishlist Details Not Found");
                     return NotFound(new { success = false, message = "Wishlist Details Not Found" });
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }

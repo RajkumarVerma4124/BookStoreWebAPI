@@ -3,6 +3,7 @@ using CommonLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -18,17 +19,21 @@ namespace BookStoreAPI.Controllers
     public class CartController : ControllerBase
     {
         /// <summary>
-        /// Object Reference For Interface ICartBL
+        /// Object Reference For Interface ICartBL,ILogger
         /// </summary>
         private readonly ICartBL cartBL;
+        private readonly ILogger<CartController> logger;
+
 
         /// <summary>
-        /// Constructor To Initialize The Instance Of Interface ICartBL
+        /// Constructor To Initialize The Instance Of Interface ICartBL,ILogger
         /// </summary>
         /// <param name="cartBL"></param>
-        public CartController(ICartBL cartBL)
+        /// <param name="logger"></param>
+        public CartController(ICartBL cartBL, ILogger<CartController> logger)
         {
             this.cartBL = cartBL;
+            this.logger = logger;
         }
 
         /// <summary>
@@ -46,15 +51,18 @@ namespace BookStoreAPI.Controllers
                 var resBook = this.cartBL.AddBookToCart(cartModel, userId);
                 if (resBook != null)
                 {
+                    logger.LogInformation("Book Added To Cart Successfully");
                     return Created("", new { success = true, message = "Book Added To Cart Successfully", data = resBook });
                 }
                 else
                 {
+                    logger.LogWarning("Book Addition To Cart Failed");
                     return BadRequest(new { success = false, message = "Book Addition To Cart Failed" });
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
@@ -74,15 +82,18 @@ namespace BookStoreAPI.Controllers
                 var resBook = this.cartBL.DeleteCart(cartId, userId);
                 if (!string.IsNullOrEmpty(resBook))
                 {
+                    logger.LogInformation(resBook);
                     return Ok(new { success = true, data = resBook });
                 }
                 else
                 {
+                    logger.LogWarning("Cart Not Found For Deletion");
                     return NotFound(new { success = false, message = "Cart Not Found For Deletion" });
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
@@ -104,15 +115,18 @@ namespace BookStoreAPI.Controllers
                 var resBook = this.cartBL.UpdateBook(cartId, bookquantity, userId);
                 if (resBook != null)
                 {
+                    logger.LogInformation("Updated The Cart Succesfully");
                     return Ok(new { success = true, message = "Updated The Cart Succesfully" });
                 }
                 else
                 {
-                    return NotFound(new { success = false, message = "Cart Not Found" });
+                    logger.LogWarning("Cart Not Found For Update");
+                    return NotFound(new { success = false, message = "Cart Not Found For Update" });
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
@@ -131,15 +145,18 @@ namespace BookStoreAPI.Controllers
                 var resCartlist = this.cartBL.GetAllCartDetails(userId);
                 if (resCartlist !=  null)
                 {
+                    logger.LogInformation("Got All The Cart Details Succesfully");
                     return Ok(new { success = true, message = "Got All The Cart Details Succesfully", data = resCartlist });
                 }
                 else
                 {
+                    logger.LogWarning("Cart Details Not Found");
                     return NotFound(new { success = false, message = "Cart Details Not Found" });
                 }
             }
             catch (Exception ex)
             {
+                logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }

@@ -30,7 +30,6 @@ namespace CommonLayer.Models
         //Checking The Pattern For Password And Giving Required Annotations For Password Property
         [Required(ErrorMessage = "{0} should not be empty")]
         [RegularExpression(@"^(\\+?\d{1,3}[- ]?)?\d{10}$", ErrorMessage = "Passsword is not valid")]
-        [DataType(DataType.PhoneNumber)]
-        public long MobileNumber { get; set; }
+        public string MobileNumber { get; set; }
     }
 }

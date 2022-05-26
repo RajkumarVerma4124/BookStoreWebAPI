@@ -15,5 +15,6 @@ namespace RepositoryLayer.Interface
         string DeleteAddress(int addressId);
         IList<AddressResponse> GetAddressDetails(int userId, int typeId);
         IList<AddressResponse> GetAllAddressDetails(int userId);
+        AddressResponse GetAddressById(int userId, int addressId);
     }
 }

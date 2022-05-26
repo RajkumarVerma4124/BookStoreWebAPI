@@ -67,7 +67,7 @@ namespace RepositoryLayer.Service
                             cartList.Add(model);
                         }
                         //Closing the reader
-                        reader.Close();//Closing the reader
+                        reader.Close();
                         foreach (var cart in cartList)
                         {
                             command = new SqlCommand("spAddOrders", sqlConnection);
@@ -163,7 +163,7 @@ namespace RepositoryLayer.Service
             orderModel.BookName = reader["BookName"] == DBNull.Value ? default : reader["BookName"].ToString();
             orderModel.AuthorName = reader["AuthorName"] == DBNull.Value ? default : reader["AuthorName"].ToString();
             orderModel.OrderDateTime = Convert.ToDateTime(reader["OrderDate"] == DBNull.Value ? default : reader["OrderDate"].ToString());
-            orderModel.OrderDate = orderModel.OrderDateTime.ToString("dd-MM-yyyy");
+            orderModel.OrderDate = orderModel.OrderDateTime.ToString("MMMM dd");
             orderModel.BookImage = reader["BookImage"] == DBNull.Value ? default : reader["BookImage"].ToString();
             orderModel.BookQuantity = Convert.ToInt32(reader["BookQuantity"] == DBNull.Value ? default : reader["BookQuantity"]);
             orderModel.OrderTotalPrice = Math.Round(Convert.ToDouble(reader["OrderTotalPrice"] == DBNull.Value ? default : reader["OrderTotalPrice"]), 2);
