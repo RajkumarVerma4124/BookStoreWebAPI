@@ -3,10 +3,15 @@ using CommonLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BookStoreAPI.Controllers
 {
@@ -19,21 +24,22 @@ namespace BookStoreAPI.Controllers
     public class CartController : ControllerBase
     {
         /// <summary>
-        /// Object Reference For Interface ICartBL,ILogger
+        /// Object Reference For Interface ICartBL,ILogger,IDistributedCache
         /// </summary>
         private readonly ICartBL cartBL;
         private readonly ILogger<CartController> logger;
-
+        private readonly IDistributedCache distributedCache;
 
         /// <summary>
-        /// Constructor To Initialize The Instance Of Interface ICartBL,ILogger
+        /// Constructor To Initialize The Instance Of Interface ICartBL,ILogger,IDistributedCache
         /// </summary>
         /// <param name="cartBL"></param>
         /// <param name="logger"></param>
-        public CartController(ICartBL cartBL, ILogger<CartController> logger)
+        public CartController(ICartBL cartBL, ILogger<CartController> logger, IDistributedCache distributedCache)
         {
             this.cartBL = cartBL;
             this.logger = logger;
+            this.distributedCache = distributedCache;
         }
 
         /// <summary>
@@ -158,6 +164,49 @@ namespace BookStoreAPI.Controllers
             {
                 logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+
+        /// <summary>
+        /// Get Request For Getting All cartlist Using Redis(GET: /api/wishlist/redis)
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("redis")]
+        public async Task<IActionResult> GetAllCartUsingRedisCache()
+        {
+            try
+            {
+                var cacheKey = "cartList";
+                string serializedCartList;
+                var cartList = new List<CartResponseModel>();
+                var redisCartList = await distributedCache.GetAsync(cacheKey);
+                if (redisCartList != null)
+                {
+                    logger.LogDebug("Getting The List From Redis Cache");
+                    serializedCartList = Encoding.UTF8.GetString(redisCartList);
+                    cartList = JsonConvert.DeserializeObject<List<CartResponseModel>>(serializedCartList);
+                }
+                else
+                {
+                    logger.LogDebug("Setting The CartList List To Cache Which Request For First Time");
+                    //Getting The Id Of Authorized User Using Claims Of Jwt
+                    int userId = Convert.ToInt32(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                    cartList = cartBL.GetAllCartDetails(userId).ToList();
+                    serializedCartList = JsonConvert.SerializeObject(cartList);
+                    redisCartList = Encoding.UTF8.GetBytes(serializedCartList);
+                    var options = new DistributedCacheEntryOptions()
+                        .SetAbsoluteExpiration(DateTime.Now.AddMinutes(10))
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(2));
+                    await distributedCache.SetAsync(cacheKey, redisCartList, options);
+                }
+                logger.LogInformation("Got The CartList Successfully Using Redis");
+                return Ok(cartList);
+            }
+            catch (Exception ex)
+            {
+                logger.LogCritical(ex, "Exception Thrown...");
+                return NotFound(new { success = false, message = ex.Message });
             }
         }
     }

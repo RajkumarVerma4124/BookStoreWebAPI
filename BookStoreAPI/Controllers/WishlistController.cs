@@ -3,11 +3,15 @@ using CommonLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BookStoreAPI.Controllers
 {
@@ -17,21 +21,23 @@ namespace BookStoreAPI.Controllers
     public class WishlistController : ControllerBase
     {
         /// <summary>
-        /// Object Reference For Interface ICartBL,ILogger
+        /// Object Reference For Interface ICartBL,ILogger,IDistributedCache
         /// </summary>
         private readonly IWishlistBL wishlistBL;
         private readonly ILogger<WishlistController> logger;
-
+        private readonly IDistributedCache distributedCache;
 
         /// <summary>
-        /// Constructor To Initialize The Instance Of Interface IWishlistBL,ILogger
+        /// Constructor To Initialize The Instance Of Interface IWishlistBL,ILogger,IDistributedCache
         /// </summary>
         /// <param name="wishlistBL"></param>
         /// <param name="logger"></param>
-        public WishlistController(IWishlistBL wishlistBL, ILogger<WishlistController> logger)
+        /// <param name="distributedCache"></param>
+        public WishlistController(IWishlistBL wishlistBL, ILogger<WishlistController> logger, IDistributedCache distributedCache)
         {
             this.wishlistBL = wishlistBL;
             this.logger = logger;
+            this.distributedCache = distributedCache;
         }
 
         /// <summary>
@@ -97,7 +103,7 @@ namespace BookStoreAPI.Controllers
         }
 
         /// <summary>
-        /// Post Request For Getting All Wishlist Details (POST: /api/wishlist/getall)
+        /// Get Request For Getting All Wishlist Details (GET: /api/wishlist/getall)
         /// </summary>
         /// <returns></returns>
         [HttpGet("GetAll")]
@@ -123,6 +129,48 @@ namespace BookStoreAPI.Controllers
             {
                 logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Get Request For Getting All Wishlist Using Redis(GET: /api/wishlist/redis)
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("redis")]
+        public async Task<IActionResult> GetAllWishlistUsingRedisCache()
+        {
+            try
+            {
+                var cacheKey = "wishList";
+                string serializedWishList;
+                var wishList = new List<WishListResponse>();
+                var redisWishList = await distributedCache.GetAsync(cacheKey);
+                if (redisWishList != null)
+                {
+                    logger.LogDebug("Getting The List From Redis Cache");
+                    serializedWishList = Encoding.UTF8.GetString(redisWishList);
+                    wishList = JsonConvert.DeserializeObject<List<WishListResponse>>(serializedWishList);
+                }
+                else
+                {
+                    logger.LogDebug("Setting The Wishlist List To Cache Which Request For First Time");
+                    //Getting The Id Of Authorized User Using Claims Of Jwt
+                    int userId = Convert.ToInt32(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                    wishList = wishlistBL.GetAllWishlistDetails(userId).ToList();
+                    serializedWishList = JsonConvert.SerializeObject(wishList);
+                    redisWishList = Encoding.UTF8.GetBytes(serializedWishList);
+                    var options = new DistributedCacheEntryOptions()
+                        .SetAbsoluteExpiration(DateTime.Now.AddMinutes(10))
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(2));
+                    await distributedCache.SetAsync(cacheKey, redisWishList, options);
+                }
+                logger.LogInformation("Got The WishList Successfully Using Redis");
+                return Ok(wishList);
+            }
+            catch (Exception ex)
+            {
+                logger.LogCritical(ex, " Exception Thrown...");
+                return NotFound(new { success = false, message = ex.Message });
             }
         }
     }

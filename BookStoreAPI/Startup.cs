@@ -76,7 +76,11 @@ namespace BookStoreAPI
                     IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(Configuration["Jwt:SecretKey"]))
                 };
             });
-
+            services.AddControllers(); services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = "localhost:6379";
+            });
+            services.AddMemoryCache();
         }
 
         private static void ConfigureSwagger(IServiceCollection services)

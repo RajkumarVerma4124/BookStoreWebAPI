@@ -3,10 +3,15 @@ using CommonLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BookStoreAPI.Controllers
 {
@@ -23,16 +28,19 @@ namespace BookStoreAPI.Controllers
         /// </summary>
         private readonly IAddressBL addressBL;
         private readonly ILogger<AddressController> logger;
+        private readonly IDistributedCache distributedCache;
+
 
         /// <summary>
         /// Constructor To Initialize The Instance Of Interface IAddressBL,ILogger
         /// </summary>
         /// <param name="addressBL"></param>
         /// <param name="logger"></param>
-        public AddressController(IAddressBL addressBL, ILogger<AddressController> logger)
+        public AddressController(IAddressBL addressBL, ILogger<AddressController> logger, IDistributedCache distributedCache)
         {
             this.addressBL = addressBL;
             this.logger = logger;
+            this.distributedCache = distributedCache;
         }
 
         /// <summary>
@@ -214,6 +222,48 @@ namespace BookStoreAPI.Controllers
             {
                 logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Get Request For Getting All Address Using Redis (GET: /api/book/redis)
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("redis")]
+        public async Task<IActionResult> GetAllAddressRedisCache()
+        {
+            try
+            {
+                var cacheKey = "addressList";
+                string serializedAddressList;
+                var addressList = new List<AddressResponse>();
+                var redisAddressList = await distributedCache.GetAsync(cacheKey);
+                if (redisAddressList != null)
+                {
+                    logger.LogDebug("Getting The List From Redis Cache");
+                    serializedAddressList = Encoding.UTF8.GetString(redisAddressList);
+                    addressList = JsonConvert.DeserializeObject<List<AddressResponse>>(serializedAddressList);
+                }
+                else
+                {
+                    logger.LogDebug("Setting The BooksList List To Cache Which Request For First Time");
+                    //Getting The Id Of Authorized User Using Claims Of Jwt
+                    int userId = Convert.ToInt32(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+                    addressList = addressBL.GetAllAddressDetails(userId).ToList();
+                    serializedAddressList = JsonConvert.SerializeObject(addressList);
+                    redisAddressList = Encoding.UTF8.GetBytes(serializedAddressList);
+                    var options = new DistributedCacheEntryOptions()
+                        .SetAbsoluteExpiration(DateTime.Now.AddMinutes(10))
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(2));
+                    await distributedCache.SetAsync(cacheKey, redisAddressList, options);
+                }
+                logger.LogInformation("Got The BooksList Successfully Using Redis");
+                return Ok(addressList);
+            }
+            catch (Exception ex)
+            {
+                logger.LogCritical(ex, "Exception Thrown...");
+                return NotFound(new { success = false, message = ex.Message });
             }
         }
     }

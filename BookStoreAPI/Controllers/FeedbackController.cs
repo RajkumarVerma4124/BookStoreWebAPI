@@ -3,10 +3,15 @@ using CommonLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BookStoreAPI.Controllers
 {
@@ -18,21 +23,23 @@ namespace BookStoreAPI.Controllers
     public class FeedbackController : ControllerBase
     {
         /// <summary>
-        /// Object Reference For Interface IFeedbackBL,ILogger
+        /// Object Reference For Interface IFeedbackBL,ILogger,IDistributedCache
         /// </summary>
         private readonly IFeedbackBL feedbackBL;
         private readonly ILogger<FeedbackController> logger;
-
+        private readonly IDistributedCache distributedCache;
 
         /// <summary>
-        /// Constructor To Initialize The Instance Of Interface IFeedbackBL,ILogger
+        /// Constructor To Initialize The Instance Of Interface IFeedbackBL,ILogger,IDistributedCache
         /// </summary>
         /// <param name="feedbackBL"></param>
         /// <param name="logger"></param>
-        public FeedbackController(IFeedbackBL feedbackBL, ILogger<FeedbackController> logger)
+        /// <param name="distributedCache"></param>
+        public FeedbackController(IFeedbackBL feedbackBL, ILogger<FeedbackController> logger, IDistributedCache distributedCache)
         {
             this.feedbackBL = feedbackBL;
             this.logger = logger;
+            this.distributedCache = distributedCache;
         }
 
         /// <summary>
@@ -94,6 +101,46 @@ namespace BookStoreAPI.Controllers
             {
                 logger.LogError(ex.Message);
                 return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Get Request For Getting All feedbacklist Using Redis(GET: /api/wishlist/redis)
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("redis")]
+        public async Task<IActionResult> GetAllFeedbackUsingRedisCache(int bookid)
+        {
+            try
+            {
+                var cacheKey = "feedbackList";
+                string serializedFeedbackList;
+                var feedbackList = new List<FeedbackResponse>();
+                var redisFeedbackList = await distributedCache.GetAsync(cacheKey);
+                if (redisFeedbackList != null)
+                {
+                    logger.LogDebug("Getting The List From Redis Cache");
+                    serializedFeedbackList = Encoding.UTF8.GetString(redisFeedbackList);
+                    feedbackList = JsonConvert.DeserializeObject<List<FeedbackResponse>>(serializedFeedbackList);
+                }
+                else
+                {
+                    logger.LogDebug("Setting The feedbackList List To Cache Which Request For First Time");
+                    feedbackList = feedbackBL.GetAllFeedbackDetails(bookid).ToList();
+                    serializedFeedbackList = JsonConvert.SerializeObject(feedbackList);
+                    redisFeedbackList = Encoding.UTF8.GetBytes(serializedFeedbackList);
+                    var options = new DistributedCacheEntryOptions()
+                        .SetAbsoluteExpiration(DateTime.Now.AddMinutes(10))
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(2));
+                    await distributedCache.SetAsync(cacheKey, redisFeedbackList, options);
+                }
+                logger.LogInformation("Got The FeedbackList Successfully Using Redis");
+                return Ok(feedbackList);
+            }
+            catch (Exception ex)
+            {
+                logger.LogCritical(ex, "Exception Thrown...");
+                return NotFound(new { success = false, message = ex.Message });
             }
         }
     }
